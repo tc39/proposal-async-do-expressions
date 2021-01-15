@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "npm run build-loose -- --strict",
+    "build-loose": "ecmarkup --verbose spec.emu index.html"
+  },
+  "devDependencies": {
+    "ecmarkup": "^5.0.0"
+  }
+}

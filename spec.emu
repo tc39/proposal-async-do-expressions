@@ -1,0 +1,77 @@
+<!doctype html>
+<meta charset="utf8">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+<pre class="metadata">
+title: Async do expressions
+stage: 0
+contributors: Kevin Gibbons
+</pre>
+
+<emu-intro id="sec-intro">
+  <h1>Introduction</h1>
+  <p>`async do` expressions allow you to introduce an asynchronous context within synchronous code without needing an immediately-invoked async function expression.</p>
+</emu-intro>
+
+
+<emu-clause id="sec-async-do">
+  <h1>Async Do Expressions</h1>
+  <h2>Syntax</h2>
+  <emu-grammar type="definition">
+    AsyncDoExpression :
+      `async` `do` Block[~Yield, +Await, ~Return]
+  </emu-grammar>
+  <emu-note><p>Unlike `do` expressions, `yield` can never be used within an `async do` expression.</p></emu-note>
+
+  <emu-clause id="sec-doexpression-static-semantics-early-errors">
+    <h1>Static Semantics: Early Errors</h1>
+    <emu-grammar>AsyncDoExpression: `async` `do` Block</emu-grammar>
+    <p>TODO: pretty much the same list as for regular do expressions.</p>
+  </emu-clause>
+
+  <emu-clause id="sec-doexpression-runtime-semantics-evaluation">
+    <h1>Runtime Semantics: Evaluation</h1>
+    <emu-grammar>AsyncDoExpression: `async` `do` Block</emu-grammar>
+    <emu-alg>
+      1. Let _promiseCapability_ be ! NewPromiseCapability(%Promise%).
+      1. Perform ! AsyncDoStart(_promiseCapability_, |Block|).
+      1. Return Completion { [[Type]]: ~return~, [[Value]]: _promiseCapability_.[[Promise]], [[Target]]: ~empty~ }.
+    </emu-alg>
+    <emu-clause id="sec-asyncdostart" aoid="AsyncDoStart">
+      <h1>AsyncDoStart ( _promiseCapability_, _block_ )</h1>
+      <p>The abstract operation AsyncDoStart takes arguments _promiseCapability_ (a PromiseCapability Record) and _block_ (a Parse Node for a |Block|). It performs the following steps when called:</p>
+      <emu-alg>
+        1. NOTE: the algorithm below is identical to AsyncFunctionStart(_promiseCapability_, |Block|) except for its handling of the final completion value.
+        1. Let _runningContext_ be the running execution context.
+        1. Let _asyncContext_ be a copy of _runningContext_.
+        1. NOTE: Copying the execution state is required for the step below to resume its execution. It is ill-defined to resume a currently executing context.
+        1. Set the code evaluation state of _asyncContext_ such that when evaluation is resumed for that execution context the following steps will be performed:
+          1. Let _result_ be the result of evaluating _block_.
+          1. Assert: If we return here, the block either threw an exception or reached the end of its body; all awaiting is done.
+          1. Remove _asyncContext_ from the execution context stack and restore the execution context that is at the top of the execution context stack as the running execution context.
+          1. If _result_.[[Type]] is ~normal~, then
+            1. Let _result_ be UpdateEmpty(_result_, *undefined*).
+            1. Perform ! Call(_promiseCapability_.[[Resolve]], *undefined*, &laquo; _result_.[[Value]] &raquo;).
+          1. Else,
+            1. Assert: _result_.[[Type]] is ~throw~.
+            1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, &laquo; _result_.[[Value]] &raquo;).
+          1. [id="step-async-do-evaluation-return-undefined"] Return.
+        1. Push _asyncContext_ onto the execution context stack; _asyncContext_ is now the running execution context.
+        1. Resume the suspended evaluation of _asyncContext_. Let _result_ be the value returned by the resumed computation.
+        1. Assert: When we return here, _asyncContext_ has already been removed from the execution context stack and _runningContext_ is the currently running execution context.
+        1. Assert: _result_ is a normal completion with a value of *undefined*. The possible sources of completion values are Await or, if the async `do` doesn't await anything, step <emu-xref href="#step-async-do-evaluation-return-undefined"></emu-xref> above.
+        1. Return.
+      </emu-alg>
+    </emu-clause>
+  </emu-clause>
+</emu-clause>
+
+<emu-clause id="sec-integration">
+  <h1>Integration</h1>
+  <h2>Syntax</h2>
+  <emu-grammar>
+    PrimaryExpression[Yield, Await] :
+      <ins>AsyncDoExpression</ins>
+  </emu-grammar>
+  <emu-note><p>Unlike `do` expressions, `async do` expressions can be used in statement position.</p></emu-note>
+
+</emu-clause>
