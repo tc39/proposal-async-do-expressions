@@ -18,7 +18,7 @@ contributors: Kevin Gibbons
   <h2>Syntax</h2>
   <emu-grammar type="definition">
     AsyncDoExpression :
-      `async` `do` Block[~Yield, +Await, ~Return]
+      `async` [no LineTerminator here] `do` Block[~Yield, +Await, ~Return]
   </emu-grammar>
   <emu-note><p>Unlike `do` expressions, `yield` can never be used within an `async do` expression.</p></emu-note>
 
