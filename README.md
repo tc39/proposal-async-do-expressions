@@ -4,7 +4,7 @@
 
 This proposal builds off of the [`do` expressions proposal](https://github.com/bakkot/do-expressions-v2).
 
-This proposal has [preliminary spec text](https://bakkot.github.io/proposal-async-do-expressions/).
+This proposal has [preliminary spec text](https://tc39.github.io/proposal-async-do-expressions/).
 
 ## Motivation
 
