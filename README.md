@@ -2,7 +2,7 @@
 
 `async do` expressions allow you to introduce an asynchronous context within synchronous code without needing an immediately-invoked async function expression.
 
-This proposal builds off of the [`do` expressions proposal](https://github.com/bakkot/do-expressions-v2).
+This proposal builds off of the [`do` expressions proposal](https://github.com/tc39/proposal-do-expressions).
 
 This proposal has [preliminary spec text](https://bakkot.github.io/proposal-async-do-expressions/).
 
